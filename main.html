@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIVISÃO DO CHURRAS 🥩</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.4s, color 0.4s;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center;     /* Center vertically */
+            min-height: 100vh;       /* Full viewport height */
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            background-color: #444;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #666;
+            border-radius: 4px;
+            background-color: #555;
+            color: #f5f5f5;
+            box-sizing: border-box; /* Ensure padding does not affect width */
+        }
+        .input-large {
+            width: calc(100% - 32px);
+        }
+        .btn {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+        .btn-reset {
+            margin: 20px 0;
+            background-color: #dc3545;
+        }
+        .btn-reset:hover {
+            background-color: #c82333;
+        }
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #666;
+        }
+        .icon {
+            cursor: pointer;
+            color: #007bff;
+            margin-left: 10px;
+        }
+        .icon:hover {
+            color: #0056b3;
+        }
+        .remove-btn {
+            color: #dc3545;
+        }
+        .remove-btn:hover {
+            color: #c82333;
+        }
+        .item-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .item-list li {
+            margin-bottom: 5px;
+        }
+        .person-total {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #555;
+            border-radius: 4px;
+        }
+        .toggle-mode {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .toggle-mode .icon {
+            font-size: 24px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .toggle-mode span {
+            margin-left: 10px;
+        }
+        .light-mode {
+            background-color: #fff;
+            color: #333;
+        }
+        .light-mode .container {
+            background-color: #fff;
+        }
+        .light-mode .form-group input, .light-mode .form-group select {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .light-mode .person-total {
+            background-color: #e9ecef;
+        }
+        @media (max-width: 600px) {
+            .btn {
+                display: block;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .form-group input, .form-group select {
+                width: calc(100% - 20px); /* Adjust for mobile padding */
+            }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <div class="container">
+        <h1>DIVISÃO DO CHURRAS 🥩</h1>
+        <div class="toggle-mode">
+            <i class="icon" onclick="toggleMode()">🥩</i>
+            <span id="mode-label">Modo Escuro</span>
+        </div>
+        <div class="form-group">
+            <label for="item">Item</label>
+            <select id="item" class="form-control input-large">
+                <option value="">Selecione...</option>
+                <option value="Churrasco 🥩">Churrasco 🥩</option>
+                <option value="Bebidas 🍻">Bebidas 🍻</option>
+                <option value="Mercado 🛒">Mercado 🛒</option>
+                <option value="Chácara 🏡">Chácara 🏡</option>
+                <option value="Gasolina ⛽">Gasolina ⛽</option>
+                <option value="Pizza 🍕">Pizza 🍕</option>
+                <option value="Outros ...">Outros ...</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="valor">Valor (R$)</label>
+            <input type="number" id="valor" class="form-control input-large" step="0.01" min="0">
+        </div>
+        <button class="btn" onclick="adicionarItem()">Adicionar Item</button>
+        <ul id="listaItens"></ul>
+        <div class="form-group">
+            <label for="pessoa">Pessoa</label>
+            <input type="text" id="pessoa" class="form-control input-large">
+        </div>
+        <button class="btn" onclick="adicionarPessoa()">Adicionar Pessoa</button>
+        <ul id="listaPessoas"></ul>
+        <button class="btn" onclick="calcularTotal()">Calcular Total</button>
+        <div id="resultado"></div>
+        <button class="btn btn-reset" onclick="resetarCampos()">Resetar</button>
+    </div>
+    <script>
+        var itens = [];
+        var pessoas = [];
+
+        function adicionarItem() {
+            var item = document.getElementById('item').value;
+            var valor = parseFloat(document.getElementById('valor').value) || 0;
+            if (item && valor > 0) {
+                var id = itens.length;
+                itens.push({ id, item, valor });
+                atualizarListaItens();
+                document.getElementById('item').value = '';
+                document.getElementById('valor').value = '';
+            }
+        }
+
+        function atualizarListaItens() {
+            var listaItens = document.getElementById('listaItens');
+            listaItens.innerHTML = '';
+            itens.forEach(function(item) {
+                listaItens.innerHTML += `
+                    <li class="list-item" id="item-${item.id}">
+                        ${item.item} - R$ ${item.valor.toFixed(2)}
+                        <span class="icon edit-btn" onclick="editarItem(${item.id})"><i class="fas fa-edit"></i></span>
+                        <span class="icon remove-btn" onclick="confirmarRemoverItem(${item.id})"><i class="fas fa-trash-alt"></i></span>
+                    </li>
+                `;
+            });
+        }
+
+        function confirmarRemoverItem(id) {
+            if (confirm("Tem certeza que deseja excluir este item?")) {
+                removerItem(id);
+            }
+        }
+
+        function removerItem(id) {
+            itens = itens.filter(item => item.id !== id);
+            atualizarListaItens();
+        }
+
+        function editarItem(id) {
+            var item = prompt("Editar Item", itens.find(i => i.id === id).item);
+            var valor = parseFloat(prompt("Editar Valor", itens.find(i => i.id === id).valor)) || 0;
+            if (item && valor) {
+                itens = itens.map(i => i.id === id ? { id, item, valor } : i);
+                atualizarListaItens();
+            }
+        }
+
+        function adicionarPessoa() {
+            var pessoa = document.getElementById('pessoa').value;
+            if (pessoa) {
+                var id = pessoas.length;
+                pessoas.push({ id, pessoa });
+                atualizarListaPessoas();
+                document.getElementById('pessoa').value = '';
+            }
+        }
+
+        function atualizarListaPessoas() {
+            var listaPessoas = document.getElementById('listaPessoas');
+            listaPessoas.innerHTML = '';
+            pessoas.forEach(function(pessoa) {
+                listaPessoas.innerHTML += `
+                    <li class="list-item" id="pessoa-${pessoa.id}">
+                        ${pessoa.pessoa}
+                        <span class="icon remove-btn" onclick="confirmarRemoverPessoa(${pessoa.id})"><i class="fas fa-trash-alt"></i></span>
+                    </li>
+                `;
+            });
+        }
+
+        function confirmarRemoverPessoa(id) {
+            if (confirm("Tem certeza que deseja excluir esta pessoa?")) {
+                removerPessoa(id);
+            }
+        }
+
+        function removerPessoa(id) {
+            pessoas = pessoas.filter(p => p.id !== id);
+            atualizarListaPessoas();
+        }
+
+        function calcularTotal() {
+            var total = itens.reduce((acc, item) => acc + item.valor, 0);
+            var totalPorPessoa = total / pessoas.length;
+            var resultado = `Total: R$ ${total.toFixed(2)}<br>`;
+            resultado += `Cada pessoa deve pagar: R$ ${totalPorPessoa.toFixed(2)}<br>`;
+            document.getElementById('resultado').innerHTML = resultado;
+        }
+
+        function resetarCampos() {
+            itens = [];
+            pessoas = [];
+            atualizarListaItens();
+            atualizarListaPessoas();
+            document.getElementById('resultado').innerHTML = '';
+        }
+
+        function toggleMode() {
+            var body = document.body;
+            var modeLabel = document.getElementById('mode-label');
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                modeLabel.textContent = 'Modo Claro';
+            } else {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                modeLabel.textContent = 'Modo Escuro';
+            }
+        }
+    </script>
+</body>
+</html>
